@@ -19,13 +19,15 @@ pthread_t doctors[13];
 pthread_mutex_t lock1;
 pthread_mutex_t lock2;
 pthread_barrier_t barrier;
-
+pthread_mutex_t print_lock;
 int* coordinates;
 int ready;
 
 void* first_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "Calling the war council of Gallifrey...\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     pthread_mutex_lock( &lock1 );
     pthread_mutex_lock( &lock2 );
@@ -33,42 +35,51 @@ void* first_doctor( void* arg ) {
     int* c = calculate( input );
     coordinates[0] += *c;
     ready++;
-    pthread_mutex_unlock( &lock1 );
     pthread_mutex_unlock( &lock2 );
+    pthread_mutex_unlock( &lock1 );
+    free(c);
     free( input );
     input = NULL;
 }
 void* second_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "This is the Doctor!\n" );
-
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 477 );
     int* c = calculate( input );
+    pthread_mutex_lock(&lock2);
     coordinates[0] += *c;
+    pthread_mutex_unlock(&lock2);
     free( c );
     free( input );
+    pthread_mutex_lock(&lock1);
     ready++;
+    pthread_mutex_unlock(&lock1);
 }
 void* third_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "Ready!\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 482 );
     int* c = calculate( input );
     free( input );
-    free( c );
     pthread_mutex_lock( &lock2 );
     coordinates[0] += *c;
     pthread_mutex_unlock( &lock2 );
-
+    free( c );
     pthread_mutex_lock( &lock1 );
     ready++;
     pthread_mutex_unlock( &lock1 );
 }
 void* fourth_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "Commencing Calculations...\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 839 );
     int* c = calculate( input );
@@ -77,15 +88,16 @@ void* fourth_doctor( void* arg ) {
     pthread_mutex_unlock( &lock2 );
     free( c );
     free( input );
-
     pthread_mutex_lock( &lock1 );
     ready++;
     pthread_mutex_unlock( &lock1 );
-    free( input );
+    // free( input );
 }
 void* fifth_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "Nearly there?\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 178 );
     int* c = calculate( input );
@@ -101,7 +113,9 @@ void* fifth_doctor( void* arg ) {
 
 void* sixth_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "Just about!\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 970 );
     int* c = calculate( input );
@@ -117,11 +131,13 @@ void* sixth_doctor( void* arg ) {
 
 void* seventh_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "Cross the boundaries that divide one universe from another...\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 235 );
     int* c = calculate( input );
-    pthread_mutex_unlock( &lock2 );
+    pthread_mutex_lock( &lock2 );
     coordinates[1] += *c;
     pthread_mutex_unlock( &lock2 );
     free( c );
@@ -133,7 +149,9 @@ void* seventh_doctor( void* arg ) {
 
 void* eighth_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "Lock on to these coordinates!\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 919 );
     int* c = calculate( input );
@@ -149,7 +167,9 @@ void* eighth_doctor( void* arg ) {
 
 void* war_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "Oh for gods' sake... Gallifrey stands!\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 93 );
     int* c = calculate( input );
@@ -168,15 +188,17 @@ void* war_doctor( void* arg ) {
 
 void* ninth_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "And for my next trick...!\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 57 );
     int* c = calculate( input );
+    pthread_mutex_lock( &lock1 );
     pthread_mutex_lock( &lock2 );
     coordinates[2] += *c;
     free( c );
     free( input );
-    pthread_mutex_lock( &lock1 );
     ready++;
     pthread_mutex_unlock( &lock2 );
     pthread_mutex_unlock( &lock1 );
@@ -184,7 +206,9 @@ void* ninth_doctor( void* arg ) {
 
 void* tenth_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "Allons-y!\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 712 );
     int* c = calculate( input );
@@ -200,7 +224,9 @@ void* tenth_doctor( void* arg ) {
 
 void* eleventh_doctor( void* arg ) {
     pthread_barrier_wait( &barrier );
+    pthread_mutex_lock(&print_lock);
     printf( "GERONIMO!\n" );
+    pthread_mutex_unlock(&print_lock);
     char * input = malloc( 33 );
     read_data( input, 272 );
     int* c = calculate( input );
@@ -222,7 +248,7 @@ void* twelfth_doctor( void* arg ) {
     pthread_mutex_lock( &lock1 );
     pthread_mutex_lock( &lock2 );
     coordinates[3] += *c;
-
+    pthread_mutex_unlock( &lock2 ); 
     free( c );
     free( input );
     ready++;
@@ -239,6 +265,8 @@ int main( int argc, char** argv ) {
     coordinates = calloc( 4, sizeof( int ) );
     pthread_mutex_init( &lock1, NULL );
     pthread_mutex_init( &lock2, NULL );
+    pthread_mutex_init( &print_lock, NULL );
+
     pthread_barrier_init( &barrier, NULL, num_doctors );
     gather_doctors();
     wait_until_done();
@@ -247,15 +275,18 @@ int main( int argc, char** argv ) {
     final_ready = ready;
     pthread_mutex_unlock( &lock1 );
 
+    pthread_mutex_lock(&print_lock);
     if (verify_coordinates() && final_ready == num_doctors ) {
         printf( "Gallifrey Stands!\n" );
     } else {
         printf( "Gallifrey falls...\n" );
     }
+    pthread_mutex_unlock(&print_lock);
 
     free( coordinates );
     pthread_mutex_destroy( &lock1 );
     pthread_mutex_destroy( &lock2 );
+    pthread_mutex_destroy( &print_lock );
     pthread_barrier_destroy( &barrier );
     return 0;
 }
@@ -277,7 +308,7 @@ void gather_doctors( ) {
 }
 
 void wait_until_done( ) {
-    for ( int i = 0; i < num_doctors; ++i ) {
+    for ( int i = 0; i < num_doctors; i++ ) {
         pthread_join( doctors[i], NULL );
     }
 }
@@ -302,7 +333,7 @@ int* calculate( char* input_buffer ) {
     unsigned char* output_buffer = calloc( HASH_BUFFER_LENGTH , sizeof ( unsigned char ) );
     SHA256( input_buffer, HASH_BUFFER_LENGTH, output_buffer );
     pthread_t self = pthread_self( );
-    for (int i = 0; i < num_doctors; ++i ) {
+    for (int i = 0; i < num_doctors; i++ ) {
         if ( pthread_equal( self, doctors[i] ) ){
             *res = i;
         }
