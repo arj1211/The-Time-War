@@ -275,13 +275,11 @@ int main( int argc, char** argv ) {
     final_ready = ready;
     pthread_mutex_unlock( &lock1 );
 
-    pthread_mutex_lock(&print_lock);
     if (verify_coordinates() && final_ready == num_doctors ) {
         printf( "Gallifrey Stands!\n" );
     } else {
         printf( "Gallifrey falls...\n" );
     }
-    pthread_mutex_unlock(&print_lock);
 
     free( coordinates );
     pthread_mutex_destroy( &lock1 );
